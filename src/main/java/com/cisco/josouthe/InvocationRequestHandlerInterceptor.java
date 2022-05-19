@@ -91,7 +91,10 @@ public class InvocationRequestHandlerInterceptor extends MyBaseInterceptor {
         String functionId = getReflectiveString( request, getFunctionId , "UNKNOWN-FUNCTIONID");
         String invocationId = getReflectiveString( request, getInvocationId, "UNKNOWN-INVOCATIONID" );
         Object broker = getReflectiveObject( invocationRequestHandler, brokerAttribute );
-        String azureMethodName = getReflectiveString( broker, getMethodName, "UNKNOWN-METHODNAME");
+        String azureMethodName = "UNKNOWN-METHODNAME";
+        String methodNameReturned = (String) getReflectiveObject( broker, getMethodName, functionId);
+        if( methodNameReturned != null )
+            azureMethodName = methodNameReturned;
         URL url = null;
         URI uri = null;
         try {
