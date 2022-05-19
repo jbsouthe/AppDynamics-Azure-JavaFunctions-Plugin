@@ -7,20 +7,11 @@
   <!-- <packaging>jar</packaging>  -->
 
   <dependencies>
-	<dependency>
-		<groupId>agent-api</groupId>
-		<artifactId>agent-api</artifactId>
-		<scope>system</scope>
-		<version>1.0</version>
-		<systemPath>${basedir}/libs/agent-api.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>instrumentation-sdk</groupId>
-		<artifactId>instrumentation-sdk</artifactId>
-		<scope>system</scope>
-		<version>1.0</version>
-		<systemPath>${basedir}/libs/instrumentation-sdk.jar</systemPath>
-	</dependency>
+      <dependency>
+          <groupId>com.appdynamics.agent</groupId>
+          <artifactId>agent-api</artifactId>
+          <version>20.6.0.30246</version>
+      </dependency>
       <!-- https://mvnrepository.com/artifact/io.grpc/grpc-stub -->
 	  <!--
       <dependency>
@@ -79,6 +70,12 @@
             <include>**/*.class</include>
 			<include>../com/appdynamics/agent/api/AppdynamicsAgent.class</include>
           </includes>
+            <archive>
+                <addMavenDescriptor>false</addMavenDescriptor>
+                <manifestEntries>
+                    <Plugin-Classes>com.cisco.josouthe.InvocationRequestHandlerInterceptor</Plugin-Classes>
+                </manifestEntries>
+            </archive>
 		  <outputDirectory>${basedir}</outputDirectory>
         </configuration>
       </plugin>
