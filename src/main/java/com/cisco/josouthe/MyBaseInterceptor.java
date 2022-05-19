@@ -57,13 +57,17 @@ public abstract class MyBaseInterceptor extends AGenericInterceptor {
         return value;
     }
 
-    protected Object getReflectiveObject(Object object, IReflector method) {
+    protected Object getReflectiveObject(Object object, IReflector method, Object... args) {
         Object value = null;
         if( object == null || method == null ) return value;
         try{
-            value =  method.execute(object.getClass().getClassLoader(), object);
+            if( args.length > 0 ) {
+                value = method.execute(object.getClass().getClassLoader(), object, args);
+            } else {
+                value = method.execute(object.getClass().getClassLoader(), object);
+            }
         } catch (ReflectorException e) {
-            this.getLogger().warn("Error in reflection call, exception: "+ e.getMessage(),e);
+            this.getLogger().info("Error in reflection call, method: "+ method.getClass().getCanonicalName() +" object: "+ object.getClass().getCanonicalName() +" exception: "+ e.getMessage(),e);
         }
         return value;
     }
