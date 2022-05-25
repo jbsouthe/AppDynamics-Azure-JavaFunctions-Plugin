@@ -11,10 +11,9 @@ import com.appdynamics.instrumentation.sdk.toolbox.reflection.IReflector;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 Plugin to support BT creation from Azure Java Functions, this is troublesome in configuration because of some utility methods needed to name the function
@@ -27,6 +26,7 @@ public class InvocationRequestHandlerInterceptor extends MyBaseInterceptor {
     IReflector brokerAttribute; //InvocationRequestHandler
     IReflector getMethodName; //JavaFunctionBroker
     IReflector getHeaders, getHttpMethod, getQueryParameters, getUri; //InvocationRequest - in a round about way, HttpRequestMessage Interface
+    private static Pattern optionalDecorationPattern = Pattern.compile("Optional\\[(<?string>.*)\\]");
 
     public InvocationRequestHandlerInterceptor() {
         super();
@@ -34,7 +34,7 @@ public class InvocationRequestHandlerInterceptor extends MyBaseInterceptor {
         getFunctionId = makeInvokeInstanceMethodReflector("getFunctionId"); //String
         getInvocationId = makeInvokeInstanceMethodReflector( "getInvocationId" ); //String
         brokerAttribute = makeAccessFieldValueReflector( "broker" ); //Object
-        getMethodName = makeInvokeInstanceMethodReflector( "getMethodName", String.class.getCanonicalName()); //String
+        getMethodName = makeInvokeInstanceMethodReflector( "getMethodName", String.class.getCanonicalName()); //Optional<String>
 
         getHeaders = makeInvokeInstanceMethodReflector( "getHeaders" ); // Map<String,String>
         getHttpMethod = makeInvokeInstanceMethodReflector( "getHttpMethod" ); //Object HttpMethod Enum
@@ -92,9 +92,13 @@ public class InvocationRequestHandlerInterceptor extends MyBaseInterceptor {
         String invocationId = getReflectiveString( request, getInvocationId, "UNKNOWN-INVOCATIONID" );
         Object broker = getReflectiveObject( invocationRequestHandler, brokerAttribute );
         String azureMethodName = "UNKNOWN-METHODNAME";
-        String methodNameReturned = (String) getReflectiveObject( broker, getMethodName, functionId);
-        if( methodNameReturned != null )
-            azureMethodName = methodNameReturned;
+        Optional<String> methodNameReturned = (Optional<String>) getReflectiveObject( broker, getMethodName, functionId);
+        if( methodNameReturned != null && methodNameReturned.isPresent() ) {
+            azureMethodName = methodNameReturned.get();
+            Matcher matcher = optionalDecorationPattern.matcher(azureMethodName);
+            if( matcher.matches() )
+                azureMethodName = matcher.group("string");
+        }
         URL url = null;
         URI uri = null;
         try {

@@ -41,7 +41,7 @@ public abstract class MyBaseInterceptor extends AGenericInterceptor {
         try{
             value = (String) method.execute(object.getClass().getClassLoader(), object);
         } catch (ReflectorException e) {
-            this.getLogger().warn("Error in reflection call, exception: "+ e.getMessage(),e);
+            this.getLogger().debug("Error in reflection call, exception: "+ e.getMessage(),e);
         }
         return value;
     }
@@ -52,7 +52,7 @@ public abstract class MyBaseInterceptor extends AGenericInterceptor {
         try{
             value = (Integer) method.execute(object.getClass().getClassLoader(), object);
         } catch (ReflectorException e) {
-            this.getLogger().warn("Error in reflection call, exception: "+ e.getMessage(),e);
+            this.getLogger().debug("Error in reflection call, exception: "+ e.getMessage(),e);
         }
         return value;
     }
@@ -67,7 +67,7 @@ public abstract class MyBaseInterceptor extends AGenericInterceptor {
                 value = method.execute(object.getClass().getClassLoader(), object);
             }
         } catch (ReflectorException e) {
-            this.getLogger().info("Error in reflection call, method: "+ method.getClass().getCanonicalName() +" object: "+ object.getClass().getCanonicalName() +" exception: "+ e.getMessage(),e);
+            this.getLogger().debug("Error in reflection call, method: "+ method.getClass().getCanonicalName() +" object: "+ object.getClass().getCanonicalName() +" exception: "+ e.getMessage(),e);
         }
         return value;
     }
